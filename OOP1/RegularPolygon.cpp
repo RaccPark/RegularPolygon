@@ -45,10 +45,13 @@ void RegularPolygon::update(InputManager& input)
 
 void RegularPolygon::draw()
 {
+	if (!isVisible()) return;
+
 	if (n_frames > 0) {
 		n_frames--;
 		if (n_frames % 2 == 0) return;
 	}
+
 	for (int i = 0; i < points.size(); i++) {
 		canvas.drawLine('#', 
 			points.at( i      % (int)points.size()) * radius + getPosition(),

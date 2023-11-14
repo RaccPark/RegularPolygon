@@ -22,15 +22,25 @@ void RegularPolygonManager::getPolygons(Position& start, Position& end) {
 		auto objPos = obj->getPosition();
 		if (objPos.x >= minX && objPos.x <= maxX
 			&& objPos.y >= minY && objPos.y <= maxY) {
-			selectedObjs.push_back(obj);
+			selectedObjs.insert(obj);
 
 			RegularPolygon* polygon = nullptr;
 			polygon = dynamic_cast<RegularPolygon*>(obj);
-			if (polygon != nullptr)	polygon->setBlinkingPeriod(30);
+			if (polygon != nullptr) {
+
+				//polygon->setBlinkingPeriod(30);
+				
+			}
 		}
+	});
+}
+
+// Á» ´õ »þÇÁÇÏ°Ô µå·¡±× ¾È¿¡ ÀÖ´Â ¾ÖµéÀº ±ôºý±ôºý ¹þ¾î³ª¸é ¾È±ôºýÀ¸·Î ÇÏ°í ¸¶Áö¸·¿¡ ¸¶¿ì½º¸¦ ³õ¾ÒÀ» ¶§ ¼±ÅÃµÈ ¾Öµé¸¸ Àá±ñµ¿¾È ±ôºý±ôºý
+void RegularPolygonManager::setBlinking() {
+	Debug::Log("%d", selectedObjs.size());
+	for_each(selectedObjs.begin(), selectedObjs.end(), [&](GameObject* obj) {
+		obj->setVisible(!(obj->isVisible()));
 		});
-
-
 }
 
 void RegularPolygonManager::addPoint() {
@@ -134,9 +144,13 @@ void RegularPolygonManager::update(InputManager& input) {
 	}
 
 	if (input.getMouseButton(0)) {
+		if (selectedObjs.size() > 0) {
+			selectedObjs.clear();
+		}
 		auto mousePos = input.getMousePosition();
 		this->mouseCurr = mousePos;
 		selectRect->canvas.drawRectangle(mouseStart, mouseCurr, true);
+		getPolygons(mouseStart, mouseCurr);
 	}
 
 	if (input.getMouseButtonUp(0)) {
@@ -174,6 +188,7 @@ void RegularPolygonManager::update(InputManager& input) {
 		move(input);
 	}
 
+	setBlinking();
 	// DEBUG
 	/*
 	if (input.getKeyDown(VK_F1)) {
