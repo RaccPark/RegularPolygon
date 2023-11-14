@@ -150,6 +150,7 @@
     <ClCompile Include="ParticleBullet.cpp" />
     <ClCompile Include="Card.cpp" />
     <ClCompile Include="RegularPolygon.cpp" />
+    <ClCompile Include="RegularPolygonManager.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -163,6 +164,7 @@
     <ClInclude Include="ParticleBullet.h" />
     <ClInclude Include="Card.h" />
     <ClInclude Include="RegularPolygon.h" />
+    <ClInclude Include="RegularPolygonManager.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
