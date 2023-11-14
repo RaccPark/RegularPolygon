@@ -14,8 +14,9 @@ class RegularPolygon :
 {
     vector<Vector2> points;
     float   radius;
-
     float   rotationSpeed;
+
+    int n_frames;
 
     void configure(unsigned int n) {
         if (n == 0 || n == 1) return;
@@ -28,18 +29,29 @@ class RegularPolygon :
         }
     }
 
-    void rotate();
+    
 
 public:
     // set the center position to its game object position.
     RegularPolygon(int n, const Vector2& center, float radius) : GameObject("polygon", center, { (int)radius, (int)radius }, true),
-        radius(radius), rotationSpeed(PI / 180.0f) // rotation speed by one degree
+        radius(radius), rotationSpeed(PI / 180.0f), // rotation speed by one degree
+        n_frames(0)
     {
         configure(n);
     }
-
+    void rotate();
     void update(InputManager& input) override;
     void draw() override;
+
+    void setBlinkingPeriod(int n_frames)
+    {
+        this->n_frames = n_frames;
+    }
+    float getRotationSpeed() const { return this->rotationSpeed; }
+    void setRotationSpeed(const float speed) { this->rotationSpeed = speed; }
+    float getRadius() const { return this->radius; }
+    void setRadius(const float radius) { this->radius = radius; }
+
 
     RegularPolygon& operator++() {
         configure((int)points.size() + 1);

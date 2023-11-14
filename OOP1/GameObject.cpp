@@ -9,6 +9,7 @@
 #include "InputManager.h"
 #include <algorithm>
 #include "RegularPolygon.h"
+#include "RegularPolygonManager.h"
 
 using namespace std;
 
@@ -23,8 +24,17 @@ void GameObject::Initialize()
 	objs.clear();
 	
 	auto dim = canvas.getDimension();
-	auto polygon = new RegularPolygon(2, { dim.x / 2, dim.y / 2 }, 10.0f);
-	GameObject::Add(polygon);
+	auto manager = new RegularPolygonManager();
+	//for (int i = 0; i < 5; i++) {
+	//	auto polygon = new RegularPolygon(rand() % 5, {rand() % dim.x, rand() % dim.y}, 3.0f);
+	//	GameObject::Add(polygon);
+	//}
+	GameObject::Add(new RegularPolygon(rand() % 5 + 2, { 14, 20 }, 5.0f));
+	GameObject::Add(new RegularPolygon(rand() % 5 + 2, { 22, 27 }, 5.0f));
+	GameObject::Add(new RegularPolygon(rand() % 5 + 2, { 35, 11 }, 5.0f));
+	GameObject::Add(new RegularPolygon(rand() % 5 + 2, { 7, 40 }, 5.0f));
+	GameObject::Add(new RegularPolygon(rand() % 5 + 2, { 40, 4 }, 5.0f));
+	GameObject::Add(manager);
 }
 
 void GameObject::Add(GameObject* obj)
@@ -62,12 +72,14 @@ void GameObject::ProcessInput(bool& exit_flag, InputManager& input)
 		}
 		Bullet::printNumberOfCreatedBullets();
 	}
+
 	if (input.getKeyDown(VK_SPACE)) {
 		auto canvasDim = canvas.getDimension();
 
 		// pick any player closer to a randomized position.
 		auto randPos = Vector2{ rand() % (canvasDim.x - 5), rand() % (canvasDim.y - 2)};
 	}
+
 	if (input.getKeyDown('Q')) {
 		exit_flag = true;
 	}

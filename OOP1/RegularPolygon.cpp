@@ -13,7 +13,7 @@ void RegularPolygon::rotate()
 
 void RegularPolygon::update(InputManager& input)
 {
-	
+	/*
 	if (input.getKeyDown(VK_RIGHT)) ++(*this);
 	
 	if (input.getKeyDown(VK_LEFT)) (*this)--;
@@ -39,11 +39,16 @@ void RegularPolygon::update(InputManager& input)
 	if (input.getKey('D')) setPosition( getPosition() + Vector2{ 1, 0 } );
 	if (input.getKey('W')) setPosition( getPosition() +  Vector2{0, -1} );
 	if (input.getKey('S')) setPosition( getPosition() + Vector2{0, 1 } );
+	*/
 }
 
 
 void RegularPolygon::draw()
 {
+	if (n_frames > 0) {
+		n_frames--;
+		if (n_frames % 2 == 0) return;
+	}
 	for (int i = 0; i < points.size(); i++) {
 		canvas.drawLine('#', 
 			points.at( i      % (int)points.size()) * radius + getPosition(),
