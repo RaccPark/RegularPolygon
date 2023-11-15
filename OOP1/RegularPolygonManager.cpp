@@ -22,17 +22,28 @@ void RegularPolygonManager::getPolygons(Position& start, Position& end) {
 		auto objPos = obj->getPosition();
 		if (objPos.x >= minX && objPos.x <= maxX
 			&& objPos.y >= minY && objPos.y <= maxY) {
-			selectedObjs.insert(obj);
+			selectedObjs.push_back(obj);
 
-			RegularPolygon* polygon = nullptr;
-			polygon = dynamic_cast<RegularPolygon*>(obj);
-			if (polygon != nullptr) {
-
-				//polygon->setBlinkingPeriod(30);
-				
-			}
+			//RegularPolygon* polygon = nullptr;
+			//polygon = dynamic_cast<RegularPolygon*>(obj);
+			//if (polygon != nullptr) {
+			//	polygon->setBlinkingPeriod(30);
+			//}
 		}
 	});
+}
+
+bool RegularPolygonManager::isPolyInRect(Position& start, Position& end, GameObject* other){
+	auto minX = start.x < end.x ? start.x : end.x;
+	auto maxX = start.x >= end.x ? start.x : end.x;
+	auto minY = start.y < end.y ? start.y : end.y;
+	auto maxY = start.y >= end.y ? start.y : end.y;
+
+	auto otherPos = other->getPosition();
+	if (otherPos.x >= minX && otherPos.x <= maxX
+		&& otherPos.y >= minY && otherPos.y <= maxY) return true;
+	// ELSE
+	return false;
 }
 
 // 좀 더 샤프하게 드래그 안에 있는 애들은 깜빡깜빡 벗어나면 안깜빡으로 하고 마지막에 마우스를 놓았을 때 선택된 애들만 잠깐동안 깜빡깜빡
@@ -131,26 +142,52 @@ void RegularPolygonManager::move(InputManager& input) {
 }
 
 void RegularPolygonManager::update(InputManager& input) {
+
+	sort(selectedObjs.begin(), selectedObjs.end());
+	selectedObjs.erase(unique(selectedObjs.begin(), selectedObjs.end()), selectedObjs.end());
+
 	if (input.getMouseButtonDown(0)) {
 		auto mousePos = input.getMousePosition();
 
-		// 선택된 오브젝트 벡터 초기화
+		// 디설렉된 오브젝트 원상태로
 		if (selectedObjs.size() > 0) {
+			for_each(selectedObjs.begin(), selectedObjs.end(), [&](auto obj) {
+				RegularPolygon* polygon = this->cast2RegularPolygon(obj);
+				if (polygon != nullptr) {
+					polygon->setState(SelectState::Idle);
+				}
+				});
 			selectedObjs.clear();
 		}
 		selectRect = new GameObject(" ", { 0, 0 }, { 1, 1 }, true, { 0, 0 });
-		
 		this->mouseStart = mousePos;
 	}
 
 	if (input.getMouseButton(0)) {
+		// 디설렉된 오브젝트 원상태로
 		if (selectedObjs.size() > 0) {
-			selectedObjs.clear();
+			auto firstToRemove = stable_partition(selectedObjs.begin(), selectedObjs.end(), [&](auto obj) {
+				return this->isPolyInRect(mouseStart, mouseCurr, obj);
+				});
+
+			for (auto it = firstToRemove; it != selectedObjs.end(); it++) {
+				RegularPolygon* polygon = this->cast2RegularPolygon(*it);
+				if (polygon != nullptr) {
+					polygon->setState(SelectState::Idle);
+				}
+			}
+			selectedObjs.erase(firstToRemove, selectedObjs.end());
 		}
 		auto mousePos = input.getMousePosition();
 		this->mouseCurr = mousePos;
 		selectRect->canvas.drawRectangle(mouseStart, mouseCurr, true);
 		getPolygons(mouseStart, mouseCurr);
+		for_each(selectedObjs.begin(), selectedObjs.end(), [&](auto obj) {
+			RegularPolygon* polygon = this->cast2RegularPolygon(obj);
+			if (polygon != nullptr) {
+				polygon->setState(SelectState::isSelecting);
+			}
+			});
 	}
 
 	if (input.getMouseButtonUp(0)) {
@@ -158,6 +195,13 @@ void RegularPolygonManager::update(InputManager& input) {
 
 		this->mouseEnd = mousePos;
 		getPolygons(mouseStart, mouseEnd);
+		for_each(selectedObjs.begin(), selectedObjs.end(), [&](auto obj) {
+			RegularPolygon* polygon = this->cast2RegularPolygon(obj);
+			if (polygon != nullptr) {
+				polygon->setState(SelectState::Selected);
+				polygon->setBlinkingPeriod(30);
+			}
+			});
 		this->mouseStart = { 0,0 };
 		this->mouseCurr = { 0,0 };
 		this->mouseEnd = { 0,0 };
@@ -187,8 +231,6 @@ void RegularPolygonManager::update(InputManager& input) {
 	if (input.getKey('A') || input.getKey('D') || input.getKey('W') || input.getKey('S')) {
 		move(input);
 	}
-
-	setBlinking();
 	// DEBUG
 	/*
 	if (input.getKeyDown(VK_F1)) {

@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include <set>
 #include <algorithm>
 
 #include "GameObject.h"
@@ -13,7 +12,7 @@ class RegularPolygonManager: public GameObject
 {
 private:
 	GameObject* selectRect;
-	set<GameObject*> selectedObjs;
+	vector<GameObject*> selectedObjs;
 
 	Position mouseStart;
 	Position mouseCurr;
@@ -26,6 +25,7 @@ public:
 	RegularPolygon* cast2RegularPolygon(GameObject* source);
 
 	void getPolygons(Position& start, Position& end);
+	bool isPolyInRect(Position& start, Position& end, GameObject* other);
 	void setBlinking();
 
 

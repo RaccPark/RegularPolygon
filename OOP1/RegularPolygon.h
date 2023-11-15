@@ -9,12 +9,20 @@ using namespace std;
 
 #define PI 3.14159265f
 
+enum class SelectState {
+    Idle,
+    isSelecting,
+    Selected,
+};
+
 class RegularPolygon :
     public GameObject
 {
     vector<Vector2> points;
     float   radius;
     float   rotationSpeed;
+
+    SelectState state;
 
     int n_frames;
 
@@ -35,7 +43,8 @@ public:
     // set the center position to its game object position.
     RegularPolygon(int n, const Vector2& center, float radius) : GameObject("polygon", center, { (int)radius, (int)radius }, true),
         radius(radius), rotationSpeed(PI / 180.0f), // rotation speed by one degree
-        n_frames(0)
+        n_frames(0),
+        state(SelectState::Idle)
     {
         configure(n);
     }
@@ -43,14 +52,15 @@ public:
     void update(InputManager& input) override;
     void draw() override;
 
-    void setBlinkingPeriod(int n_frames)
-    {
-        this->n_frames = n_frames;
-    }
+    void setState(SelectState state) { this->state = state; }
+
+    void setBlinkingPeriod(int n_frames) { this->n_frames = n_frames; }
     float getRotationSpeed() const { return this->rotationSpeed; }
     void setRotationSpeed(const float speed) { this->rotationSpeed = speed; }
     float getRadius() const { return this->radius; }
     void setRadius(const float radius) { this->radius = radius; }
+
+
 
 
     RegularPolygon& operator++() {
